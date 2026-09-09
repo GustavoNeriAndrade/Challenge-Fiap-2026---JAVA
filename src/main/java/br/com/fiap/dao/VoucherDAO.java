@@ -13,7 +13,7 @@ import java.util.List;
 
 public class VoucherDAO {
 
-    // CREATE
+    // Create
     public void inserir(Voucher voucher) throws SQLException {
         String sql = "INSERT INTO Voucher "
                 + "(id_voucher, codigo_voucher, valor_credito_voucher, data_emissao, "
@@ -37,7 +37,7 @@ public class VoucherDAO {
         }
     }
 
-    // READ
+    // Read
     public Voucher buscarPorId(int id) throws SQLException {
         String sql = "SELECT v.id_voucher, v.codigo_voucher, v.valor_credito_voucher, "
                 + "v.data_emissao, v.data_validade, v.status_voucher, v.nome_operador_transporte, "
@@ -81,7 +81,7 @@ public class VoucherDAO {
         return vouchers;
     }
 
-    // UPDATE
+    // Update
     public void atualizar(Voucher voucher) throws SQLException {
         String sql = "UPDATE Voucher SET valor_credito_voucher = ?, data_validade = ?, "
                 + "status_voucher = ?, nome_operador_transporte = ? WHERE id_voucher = ?";
@@ -102,7 +102,7 @@ public class VoucherDAO {
         }
     }
 
-    // DELETE
+    // Delete
     public void deletar(int id) throws SQLException {
         String sql = "DELETE FROM Voucher WHERE id_voucher = ?";
 

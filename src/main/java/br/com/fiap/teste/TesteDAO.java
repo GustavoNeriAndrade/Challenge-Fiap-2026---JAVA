@@ -17,14 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
- * Classe de teste: instancia objetos e simula a utilização da aplicação,
- * exercitando as operações de CRUD de todos os DAOs implementados.
- *
- * Cada método de teste é autolimpável: os registros criados são
- * removidos do banco ao final do próprio método (na ordem inversa
- * das dependências de FK), então rodar essa classe várias vezes não
- * deixa lixo acumulado nas tabelas.
- *
  * @author Equipe EcoLoop
  * @version 1.0
  */
@@ -40,9 +32,7 @@ public class TesteDAO {
         testarCrudConversaoEVoucher();
     }
 
-    // -------------------------------------------------------------------------
     // Teste completo do CRUD de Usuario
-    // -------------------------------------------------------------------------
     static void testarCrudUsuario() {
 
         UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -83,9 +73,7 @@ public class TesteDAO {
         }
     }
 
-    // -------------------------------------------------------------------------
     // Teste completo do CRUD de Missao
-    // -------------------------------------------------------------------------
     static void testarCrudMissao() {
 
         MissaoDAO missaoDAO = new MissaoDAO();
@@ -125,10 +113,7 @@ public class TesteDAO {
         }
     }
 
-    // -------------------------------------------------------------------------
     // Teste completo do CRUD de ImpactoAmbiental
-    // (precisa de um usuário existente por causa da FK)
-    // -------------------------------------------------------------------------
     static void testarCrudImpactoAmbiental() {
 
         UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -176,10 +161,7 @@ public class TesteDAO {
         }
     }
 
-    // -------------------------------------------------------------------------
     // Teste completo do CRUD de ConversaoPontos + Voucher
-    // (fluxo real do sistema: usuário -> conversão -> voucher)
-    // -------------------------------------------------------------------------
     static void testarCrudConversaoEVoucher() {
 
         UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -197,7 +179,7 @@ public class TesteDAO {
             );
             usuarioDAO.inserir(usuarioTeste);
 
-            // CREATE ConversaoPontos
+            // Create ConversaoPontos
             int idConversaoTeste = conversaoDAO.gerarProximoId();
             ConversaoPontos novaConversao = new ConversaoPontos(
                     idConversaoTeste, idUsuarioTeste, 200, LocalDate.now().format(formato)
@@ -213,7 +195,7 @@ public class TesteDAO {
             List<ConversaoPontos> todasConversoes = conversaoDAO.listarTodos();
             System.out.println("Total de conversões cadastradas: " + todasConversoes.size());
 
-            // CREATE Voucher (agora com uma conversão real pra referenciar)
+            // Create Voucher
             int idVoucherTeste = voucherDAO.gerarProximoId();
             String codigo = "TESTE-" + idVoucherTeste;
             Voucher novoVoucher = new Voucher(
@@ -235,7 +217,7 @@ public class TesteDAO {
             List<Voucher> todosVouchers = voucherDAO.listarTodos();
             System.out.println("Total de vouchers cadastrados: " + todosVouchers.size());
 
-            // Limpeza (ordem inversa: voucher -> conversão -> usuário, por causa das FKs)
+            // Limpeza
             voucherDAO.deletar(idVoucherTeste);
             conversaoDAO.deletar(idConversaoTeste);
             usuarioDAO.deletar(idUsuarioTeste);

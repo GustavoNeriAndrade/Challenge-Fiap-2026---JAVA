@@ -20,15 +20,7 @@ import java.util.List;
  */
 public class UsuarioDAO {
 
-    // -------------------------------------------------------------------------
-    // CREATE
-    // -------------------------------------------------------------------------
-    /**
-     * Insere um novo usuário no banco de dados.
-     *
-     * @param usuario usuário a ser inserido (o id já deve estar definido)
-     * @throws SQLException se ocorrer erro na operação
-     */
+    // Create
     public void inserir(Usuario usuario) throws SQLException {
         String sql = "INSERT INTO Usuario "
                 + "(id_usuario, nome_usuario, email_usuario, senha_usuario, pontos_usuario, data_cadastro) "
@@ -49,7 +41,7 @@ public class UsuarioDAO {
         }
     }
 
-    // READ
+    // Read
     public Usuario buscarPorId(int id) throws SQLException {
         String sql = "SELECT id_usuario, nome_usuario, email_usuario, senha_usuario, "
                 + "pontos_usuario, data_cadastro FROM Usuario WHERE id_usuario = ?";
@@ -85,7 +77,7 @@ public class UsuarioDAO {
         return usuarios;
     }
 
-    // UPDATE
+    // Update
     public void atualizar(Usuario usuario) throws SQLException {
         String sql = "UPDATE Usuario SET nome_usuario = ?, email_usuario = ?, "
                 + "senha_usuario = ?, pontos_usuario = ? WHERE id_usuario = ?";
@@ -106,7 +98,7 @@ public class UsuarioDAO {
         }
     }
 
-    // DELETE
+    // Delete
     public void deletar(int id) throws SQLException {
         String sql = "DELETE FROM Usuario WHERE id_usuario = ?";
 

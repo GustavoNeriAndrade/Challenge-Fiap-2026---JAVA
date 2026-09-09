@@ -24,7 +24,7 @@ public class Main {
     // Formatador de data padrão do sistema
     static DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    // Arrays globais de usuários, missões e vouchers (usados pelo menu em tempo de execução)
+    // Arrays globais de usuários, missões e vouchers
     static Usuario[]  usuarios = new Usuario[50];
     static Missao[]   missoes  = new Missao[50];
     static Voucher[]  vouchers = new Voucher[50];
@@ -33,21 +33,21 @@ public class Main {
     static int qtdMissoes  = 0;
     static int qtdVouchers = 0;
 
-    // Contadores de ID para cada entidade (sincronizados com o banco no início da execução)
+    // Contadores de ID
     static int proximoIdUsuario = 1;
     static int proximoIdMissao  = 1;
     static int idConversao      = 1;
     static int idImpacto        = 1;
     static int idVoucher        = 1;
 
-    // DAOs responsáveis pela persistência no banco de dados Oracle
+    // DAOs
     static UsuarioDAO usuarioDAO = new UsuarioDAO();
     static MissaoDAO missaoDAO = new MissaoDAO();
     static ImpactAmbientalDAO impactoDAO = new ImpactAmbientalDAO();
     static ConversaoPontosDAO conversaoDAO = new ConversaoPontosDAO();
     static VoucherDAO voucherDAO = new VoucherDAO();
 
-    //  MENU PRINCIPAL
+    // Menu
     public static void main(String[] args) {
 
         sincronizarContadoresComBanco();
@@ -120,7 +120,7 @@ public class Main {
         }
     }
 
-    //  SINCRONIZAÇÃO DE IDs COM O BANCO (evita chave duplicada entre execuções)
+    // Sincronizando IDs com o banco
     static void sincronizarContadoresComBanco() {
         try {
             proximoIdUsuario = usuarioDAO.gerarProximoId();
@@ -135,7 +135,7 @@ public class Main {
         }
     }
 
-    //  1 - CADASTRAR USUÁRIO
+    //  1 - Cadastrar usuário
     static void cadastrarUsuario() {
 
         if (qtdUsuarios >= usuarios.length) {
@@ -208,7 +208,7 @@ public class Main {
         );
     }
 
-    //  2 - CADASTRAR MISSÃO
+    //  2 - Cadastrar missão
     static void cadastrarMissao() {
 
         if (qtdMissoes >= missoes.length) {
@@ -281,7 +281,7 @@ public class Main {
         );
     }
 
-    //  3 - CONCLUIR MISSÃO
+    //  3 - Concluir missão
     static void concluirMissao() {
 
         if (qtdUsuarios == 0) {
@@ -350,7 +350,7 @@ public class Main {
         );
     }
 
-    //  4 - CONSULTAR SALDO
+    //  4 - Consultar saldo
     static void consultarSaldo() {
 
         if (qtdUsuarios == 0) {
@@ -399,7 +399,7 @@ public class Main {
         );
     }
 
-    //  5 - CONVERTER PONTOS EM VOUCHER
+    //  5 - Converter pontos em voucher
     static void converterPontos() {
 
         if (qtdUsuarios == 0) {
@@ -530,7 +530,7 @@ public class Main {
         }
     }
 
-    //  6 - REGISTRAR IMPACTO AMBIENTAL
+    //  6 - Registrar impacto ambiental
     static void registrarImpacto() {
 
         if (qtdUsuarios == 0) {
@@ -587,7 +587,7 @@ public class Main {
         );
     }
 
-    //  7 - RANKING DE USUÁRIOS
+    //  7 - Ranking de usuário
     static void exibirRanking() {
 
         if (qtdUsuarios == 0) {
@@ -597,7 +597,7 @@ public class Main {
             return;
         }
 
-        // Copia os usuários para ordenar por pontos (bubble sort simples)
+        // Ordenar por pontos
         Usuario[] ranking = new Usuario[qtdUsuarios];
         for (int i = 0; i < qtdUsuarios; i++) {
             ranking[i] = usuarios[i];

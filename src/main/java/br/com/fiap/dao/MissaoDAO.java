@@ -23,15 +23,7 @@ import java.util.List;
  */
 public class MissaoDAO {
 
-    // -------------------------------------------------------------------------
-    // CREATE
-    // -------------------------------------------------------------------------
-    /**
-     * Insere uma nova missão no banco de dados.
-     *
-     * @param missao missão a ser inserida (o id já deve estar definido)
-     * @throws SQLException se ocorrer erro na operação
-     */
+    // Create
     public void inserir(Missao missao) throws SQLException {
         String sql = "INSERT INTO Missao "
                 + "(id_missao, titulo_missao, descricao_missao, pontos_recompensa, categoria_missao, ativa) "
@@ -52,16 +44,7 @@ public class MissaoDAO {
         }
     }
 
-    // -------------------------------------------------------------------------
     // READ
-    // -------------------------------------------------------------------------
-    /**
-     * Busca uma missão pelo id.
-     *
-     * @param id identificador da missão
-     * @return a missão encontrada, ou null se não existir
-     * @throws SQLException se ocorrer erro na operação
-     */
     public Missao buscarPorId(int id) throws SQLException {
         String sql = "SELECT id_missao, titulo_missao, descricao_missao, "
                 + "pontos_recompensa, categoria_missao, ativa FROM Missao WHERE id_missao = ?";
@@ -80,12 +63,6 @@ public class MissaoDAO {
         }
     }
 
-    /**
-     * Lista todas as missões cadastradas no banco.
-     *
-     * @return lista de missões (vazia se não houver nenhuma)
-     * @throws SQLException se ocorrer erro na operação
-     */
     public List<Missao> listarTodos() throws SQLException {
         String sql = "SELECT id_missao, titulo_missao, descricao_missao, "
                 + "pontos_recompensa, categoria_missao, ativa FROM Missao ORDER BY id_missao";
@@ -103,15 +80,7 @@ public class MissaoDAO {
         return missoes;
     }
 
-    // -------------------------------------------------------------------------
     // UPDATE
-    // -------------------------------------------------------------------------
-    /**
-     * Atualiza os dados de uma missão já existente (identificada pelo id).
-     *
-     * @param missao missão com os dados atualizados
-     * @throws SQLException se ocorrer erro na operação
-     */
     public void atualizar(Missao missao) throws SQLException {
         String sql = "UPDATE Missao SET titulo_missao = ?, descricao_missao = ?, "
                 + "pontos_recompensa = ?, categoria_missao = ?, ativa = ? WHERE id_missao = ?";
@@ -133,15 +102,7 @@ public class MissaoDAO {
         }
     }
 
-    // -------------------------------------------------------------------------
     // DELETE
-    // -------------------------------------------------------------------------
-    /**
-     * Remove uma missão do banco pelo id.
-     *
-     * @param id identificador da missão a ser removida
-     * @throws SQLException se ocorrer erro na operação
-     */
     public void deletar(int id) throws SQLException {
         String sql = "DELETE FROM Missao WHERE id_missao = ?";
 
@@ -157,16 +118,7 @@ public class MissaoDAO {
         }
     }
 
-    // -------------------------------------------------------------------------
     // Métodos auxiliares
-    // -------------------------------------------------------------------------
-    /**
-     * Gera o próximo id disponível para uma nova missão, consultando o
-     * maior id atualmente cadastrado no banco.
-     *
-     * @return próximo id disponível
-     * @throws SQLException se ocorrer erro na operação
-     */
     public int gerarProximoId() throws SQLException {
         String sql = "SELECT NVL(MAX(id_missao), 0) + 1 AS proximo_id FROM Missao";
 
@@ -179,13 +131,6 @@ public class MissaoDAO {
         }
     }
 
-    /**
-     * Monta um objeto Missao a partir da linha atual de um ResultSet.
-     *
-     * @param rs ResultSet posicionado em uma linha válida
-     * @return missão montada
-     * @throws SQLException se ocorrer erro na leitura das colunas
-     */
     private Missao montarMissao(ResultSet rs) throws SQLException {
         Missao missao = new Missao(
                 rs.getInt("id_missao"),
