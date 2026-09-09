@@ -1,6 +1,6 @@
 package br.com.fiap.dao;
 
-import br.com.fiap.bean.ImpactoAmbiental;
+import br.com.fiap.model.ImpactoAmbiental;
 import br.com.fiap.conexao.ConexaoBancoDados;
 import br.com.fiap.util.DataUtil;
 

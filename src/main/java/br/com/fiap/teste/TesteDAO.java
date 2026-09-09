@@ -1,10 +1,10 @@
 package br.com.fiap.teste;
 
-import br.com.fiap.bean.ConversaoPontos;
-import br.com.fiap.bean.ImpactoAmbiental;
-import br.com.fiap.bean.Missao;
-import br.com.fiap.bean.Usuario;
-import br.com.fiap.bean.Voucher;
+import br.com.fiap.model.ConversaoPontos;
+import br.com.fiap.model.ImpactoAmbiental;
+import br.com.fiap.model.Missao;
+import br.com.fiap.model.Usuario;
+import br.com.fiap.model.Voucher;
 import br.com.fiap.dao.ConversaoPontosDAO;
 import br.com.fiap.dao.ImpactAmbientalDAO;
 import br.com.fiap.dao.MissaoDAO;

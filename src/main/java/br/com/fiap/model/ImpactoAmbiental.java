@@ -1,4 +1,4 @@
-package br.com.fiap.bean;
+package br.com.fiap.model;
 
 public class ImpactoAmbiental {
     /** Emissão média de CO2 (kg) por km em carro particular */

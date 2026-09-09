@@ -1,6 +1,6 @@
 package br.com.fiap.dao;
 
-import br.com.fiap.bean.Missao;
+import br.com.fiap.model.Missao;
 import br.com.fiap.conexao.ConexaoBancoDados;
 
 import java.sql.Connection;

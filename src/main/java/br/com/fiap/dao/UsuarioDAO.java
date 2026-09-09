@@ -1,6 +1,6 @@
 package br.com.fiap.dao;
 
-import br.com.fiap.bean.Usuario;
+import br.com.fiap.model.Usuario;
 import br.com.fiap.conexao.ConexaoBancoDados;
 import br.com.fiap.util.DataUtil;
 
