@@ -1,12 +1,10 @@
 package br.com.fiap.main;
 
-import br.com.fiap.bean.ConversaoPontos;
-import br.com.fiap.bean.ImpactoAmbiental;
-import br.com.fiap.bean.Missao;
-import br.com.fiap.bean.Usuario;
-import br.com.fiap.bean.Voucher;
+import br.com.fiap.bean.*;
+import br.com.fiap.dao.*;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -26,7 +24,7 @@ public class Main {
     // Formatador de data padrão do sistema
     static DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    // Arrays globais de usuários, missões e vouchers
+    // Arrays globais de usuários, missões e vouchers (usados pelo menu em tempo de execução)
     static Usuario[]  usuarios = new Usuario[50];
     static Missao[]   missoes  = new Missao[50];
     static Voucher[]  vouchers = new Voucher[50];
@@ -35,13 +33,24 @@ public class Main {
     static int qtdMissoes  = 0;
     static int qtdVouchers = 0;
 
-    // Contadores de ID para cada entidade
-    static int idConversao     = 1;
-    static int idImpacto       = 1;
-    static int idVoucher       = 1;
+    // Contadores de ID para cada entidade (sincronizados com o banco no início da execução)
+    static int proximoIdUsuario = 1;
+    static int proximoIdMissao  = 1;
+    static int idConversao      = 1;
+    static int idImpacto        = 1;
+    static int idVoucher        = 1;
+
+    // DAOs responsáveis pela persistência no banco de dados Oracle
+    static UsuarioDAO usuarioDAO = new UsuarioDAO();
+    static MissaoDAO missaoDAO = new MissaoDAO();
+    static ImpactAmbientalDAO impactoDAO = new ImpactAmbientalDAO();
+    static ConversaoPontosDAO conversaoDAO = new ConversaoPontosDAO();
+    static VoucherDAO voucherDAO = new VoucherDAO();
 
     //  MENU PRINCIPAL
     public static void main(String[] args) {
+
+        sincronizarContadoresComBanco();
 
         JOptionPane.showMessageDialog(
                 null,
@@ -111,6 +120,21 @@ public class Main {
         }
     }
 
+    //  SINCRONIZAÇÃO DE IDs COM O BANCO (evita chave duplicada entre execuções)
+    static void sincronizarContadoresComBanco() {
+        try {
+            proximoIdUsuario = usuarioDAO.gerarProximoId();
+            proximoIdMissao  = missaoDAO.gerarProximoId();
+            idConversao      = conversaoDAO.gerarProximoId();
+            idImpacto        = impactoDAO.gerarProximoId();
+            idVoucher        = voucherDAO.gerarProximoId();
+        } catch (SQLException e) {
+            System.out.println("Aviso: não foi possível sincronizar os IDs com o banco. "
+                    + "Os contadores começarão em 1.");
+            e.printStackTrace();
+        }
+    }
+
     //  1 - CADASTRAR USUÁRIO
     static void cadastrarUsuario() {
 
@@ -156,10 +180,25 @@ public class Main {
         int pontos = Integer.parseInt(pontosStr);
         String dataCadastro = LocalDate.now().format(formato);
 
-        usuarios[qtdUsuarios] = new Usuario(
-                qtdUsuarios + 1, nome, email, senha, pontos, dataCadastro
+        Usuario novoUsuario = new Usuario(
+                proximoIdUsuario, nome, email, senha, pontos, dataCadastro
         );
+
+        usuarios[qtdUsuarios] = novoUsuario;
         qtdUsuarios++;
+
+        try {
+            usuarioDAO.inserir(novoUsuario);
+            proximoIdUsuario++;
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Usuário adicionado nesta sessão, mas houve um erro ao salvar no banco de dados.",
+                    "Erro de Persistência",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            e.printStackTrace();
+        }
 
         JOptionPane.showMessageDialog(
                 null,
@@ -214,10 +253,25 @@ public class Main {
         );
         if (categoria == null) categoria = "Outro";
 
-        missoes[qtdMissoes] = new Missao(
-                qtdMissoes + 1, titulo.trim(), descricao.trim(), pontosRecompensa, categoria
+        Missao novaMissao = new Missao(
+                proximoIdMissao, titulo.trim(), descricao.trim(), pontosRecompensa, categoria
         );
+
+        missoes[qtdMissoes] = novaMissao;
         qtdMissoes++;
+
+        try {
+            missaoDAO.inserir(novaMissao);
+            proximoIdMissao++;
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Missão adicionada nesta sessão, mas houve um erro ao salvar no banco de dados.",
+                    "Erro de Persistência",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            e.printStackTrace();
+        }
 
         JOptionPane.showMessageDialog(
                 null,
@@ -280,7 +334,16 @@ public class Main {
             }
         }
 
-        String resultado = missoes[idxMissao].concluirMissao(usuarios[idxUsuario]);
+        Usuario usuarioSelecionado = usuarios[idxUsuario];
+        String resultado = missoes[idxMissao].concluirMissao(usuarioSelecionado);
+
+        // Persiste o novo saldo de pontos do usuário no banco
+        try {
+            usuarioDAO.atualizar(usuarioSelecionado);
+        } catch (SQLException e) {
+            System.out.println("Erro ao atualizar o saldo do usuário no banco de dados.");
+            e.printStackTrace();
+        }
 
         JOptionPane.showMessageDialog(
                 null, resultado, "Missão Concluída!", JOptionPane.INFORMATION_MESSAGE
@@ -387,7 +450,7 @@ public class Main {
         String dataConversao = LocalDate.now().format(formato);
 
         ConversaoPontos conversao = new ConversaoPontos(
-                idConversao++, usuarioConversao.getId(), pontosConverter, dataConversao
+                idConversao, usuarioConversao.getId(), pontosConverter, dataConversao
         );
 
         String resultadoConversao = conversao.aprovar(usuarioConversao);
@@ -399,6 +462,16 @@ public class Main {
         JOptionPane.showMessageDialog(
                 null, resultadoConversao, "Resultado da Conversão", tipoMsg
         );
+
+        // Persiste a conversão (aprovada ou cancelada) e o novo saldo do usuário
+        try {
+            conversaoDAO.inserir(conversao);
+            idConversao++;
+            usuarioDAO.atualizar(usuarioConversao);
+        } catch (SQLException e) {
+            System.out.println("Erro ao salvar a conversão de pontos no banco de dados.");
+            e.printStackTrace();
+        }
 
         if ("APROVADO".equals(conversao.getStatus())) {
 
@@ -416,12 +489,20 @@ public class Main {
                     + "-" + (System.currentTimeMillis() % 100000);
 
             Voucher voucher = new Voucher(
-                    idVoucher++, usuarioConversao.getId(), conversao.getId(),
+                    idVoucher, usuarioConversao.getId(), conversao.getId(),
                     codigo, conversao.getValorCredito(),
                     dataEmissao, dataValidade, operador
             );
 
             vouchers[qtdVouchers++] = voucher;
+
+            try {
+                voucherDAO.inserir(voucher);
+                idVoucher++;
+            } catch (SQLException e) {
+                System.out.println("Erro ao salvar o voucher no banco de dados.");
+                e.printStackTrace();
+            }
 
             JOptionPane.showMessageDialog(
                     null, voucher.exibirDetalhes(), "Voucher Gerado!", JOptionPane.INFORMATION_MESSAGE
@@ -433,8 +514,17 @@ public class Main {
             );
 
             if (usar == JOptionPane.YES_OPTION) {
+                String resultadoUso = voucher.utilizar();
+
+                try {
+                    voucherDAO.atualizar(voucher);
+                } catch (SQLException e) {
+                    System.out.println("Erro ao atualizar o status do voucher no banco de dados.");
+                    e.printStackTrace();
+                }
+
                 JOptionPane.showMessageDialog(
-                        null, voucher.utilizar(), "Voucher Utilizado", JOptionPane.INFORMATION_MESSAGE
+                        null, resultadoUso, "Voucher Utilizado", JOptionPane.INFORMATION_MESSAGE
                 );
             }
         }
@@ -480,8 +570,16 @@ public class Main {
         String dataImpacto = LocalDate.now().format(formato);
 
         ImpactoAmbiental impacto = new ImpactoAmbiental(
-                idImpacto++, usuarios[idx].getId(), km, dataImpacto
+                idImpacto, usuarios[idx].getId(), km, dataImpacto
         );
+
+        try {
+            impactoDAO.inserir(impacto);
+            idImpacto++;
+        } catch (SQLException e) {
+            System.out.println("Erro ao salvar o registro de impacto ambiental no banco de dados.");
+            e.printStackTrace();
+        }
 
         JOptionPane.showMessageDialog(
                 null, impacto.gerarRelatorio(),
